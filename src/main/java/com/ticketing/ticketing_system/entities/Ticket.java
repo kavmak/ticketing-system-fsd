@@ -2,135 +2,96 @@ package com.ticketing.ticketing_system.entities;
 
 import java.time.LocalDateTime;
 
+import com.ticketing.ticketing_system.enums.Priority;
+import com.ticketing.ticketing_system.enums.Status;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "requests")  // use same table name as schema
 public class Ticket {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    int id;
-     
-    int userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    String title;
-    String status;
-    String description;
-    String priority;
-    String category;
-    String assignedTo;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
-    LocalDateTime closedAt;
+    // Many tickets can be created by one user
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User createdBy;
 
-    //Getters and Setters
+    // Many tickets can be assigned to one user (agent)
+    @ManyToOne
+    @JoinColumn(name = "assigned_to")
+    private User assignedTo;
 
-    //id
-    public int getId(){
-        return id;
-    }
+    @Column(name = "category_id", nullable = false)
+    private Long categoryId;
 
-    public void setId(int id){
-         this.id=id;
-    }
+    // Priority Enum (LOW, MED, HIGH)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Priority priority = Priority.LOW;
 
-    //userid
-    public int getUserId(){
-        return userId;
-    }
+    // Status Enum (PEND, PROC, COMP)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Status status = Status.PENDING;
 
-    public void setUserId(int userId){
-        this.userId=userId;
-    }
-    
-    //title
-      public String getTitle() {
-        return title;
-    }
-    public void setTitle(String title) {
-        this.title = title;
-    }
+    private String title;
+    private String description;
 
-    //status
-     public String getStatus() {
-        return status;
-    }
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    // Timestamps
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    //description
-     public String getDescription() {
-        return description;
-    }
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
-    // priority
-public String getPriority() {
-    return priority;
-}
-
-public void setPriority(String priority) {
-    this.priority = priority;
-}
-
-// category
-public String getCategory() {
-    return category;
-}
-
-public void setCategory(String category) {
-    this.category = category;
-}
-
-
-    //assigned to
-     public String getAssignedTo() {
-        return assignedTo;
-    }
-    public void setAssignedTo(String assignedTo) {
-        this.assignedTo = assignedTo;
-    }
-
-
-        // createdAt
-    public LocalDateTime getCreatedAt() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now(); 
-        }
-        return createdAt;
-    }
-
-    public void setCreatedAt() {
-        this.createdAt = LocalDateTime.now(); 
-    }
-
-    //updated at
-     public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public void setUpdatedAt() {
+    // Auto-update timestamp on update
+    @PreUpdate
+    public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
 
-    //closed at
-     public LocalDateTime getClosedAt() {
-        return closedAt;
-    }
-    public void setClosedAt(LocalDateTime closedAt) {
-        this.closedAt = closedAt;
-    }
+    // ---------------- Getters & Setters ----------------
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
+    public User getCreatedBy() { return createdBy; }
+    public void setCreatedBy(User createdBy) { this.createdBy = createdBy; }
 
+    public User getAssignedTo() { return assignedTo; }
+    public void setAssignedTo(User assignedTo) { this.assignedTo = assignedTo; }
+
+    public Long getCategoryId() { return categoryId; }
+    public void setCategoryId(Long categoryId) { this.categoryId = categoryId; }
+
+    public Priority getPriority() { return priority; }
+    public void setPriority(Priority priority) { this.priority = priority; }
+
+    public Status getStatus() { return status; }
+    public void setStatus(Status status) { this.status = status; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }
-
-
-
