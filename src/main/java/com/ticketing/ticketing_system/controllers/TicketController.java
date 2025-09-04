@@ -36,12 +36,8 @@ public class TicketController {
     
      @GetMapping("/tickets/{id}")
     public Ticket fetchATicket(@PathVariable("id") int id) {
-        Optional<Ticket> ticketFound = ticketRepository.findById(id);
-        if(ticketFound.isPresent()){
-            return ticketFound.get();
-        } else {
-            throw new TicketNotFoundException("Ticket not found with id " + id);
-        }
+        return ticketRepository.findById(id)
+            .orElseThrow(() -> new TicketNotFoundException("Ticket not found with id: " + id));
     }
 
      @PostMapping("/tickets")
@@ -62,7 +58,7 @@ public class TicketController {
            // ticket.setClosedAt(ticketDetails.getClosedAt());
             ticket.setUserId(ticketDetails.getUserId());
             return ticketRepository.save(ticket);
-        }).orElseThrow(() -> new RuntimeException("Ticket not found with id " + id));
+        }).orElseThrow(() -> new TicketNotFoundException("Ticket not found with id " + id));
     }
   
 
