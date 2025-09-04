@@ -1,6 +1,8 @@
 package com.ticketing.ticketing_system.controllers;
 
 import java.util.List;
+//import java.util.Optional;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import com.ticketing.ticketing_system.enums.Status;
+import com.ticketing.ticketing_system.enums.Priority;
 
 import com.ticketing.ticketing_system.entities.Ticket;
 import com.ticketing.ticketing_system.entities.User;
@@ -38,6 +42,13 @@ public class TicketController {
         return ticketRepository.findAll();
     }
     
+     @GetMapping("/tickets/{id}")
+    public Ticket fetchATicket(@PathVariable("id") int id) {
+        return ticketRepository.findById(id)
+            .orElseThrow(() -> new TicketNotFoundException("Ticket not found with id: " + id));
+    }
+
+     @PostMapping("/tickets")
     // Get a ticket by ID
     @GetMapping("/tickets/{id}")
     public Ticket fetchATicket(@PathVariable("id") Long id) {
@@ -103,7 +114,7 @@ public class TicketController {
             }
 
             return ticketRepository.save(ticket);
-        }).orElseThrow(() -> new RuntimeException("Ticket not found with id " + id));
+        }).orElseThrow(() -> new TicketNotFoundException("Ticket not found with id " + id));
     }
 
     // Assign a ticket to a user (agent)
@@ -122,5 +133,30 @@ public class TicketController {
     public String deleteTicket(@PathVariable("id") Long id) {
         ticketRepository.deleteById(id);
         return "Ticket deleted successfully";
+    }
+
+    //get all tickets by a particular status
+    @GetMapping("/tickets/status/{status}")
+    public List<Ticket> getTicketsbyStatus(@PathVariable Status status){
+       return ticketRepository.findByStatus(status);
+    }
+
+
+    //sort all tickets by status enum order
+    @GetMapping("/tickets/sorted/status")
+    public List<Ticket> getAllTicketsSortedByStatus(){
+        return ticketRepository.findAll(org.springframework.data.domain.Sort.by("status"));
+    }
+ 
+    //get tickets according to status in latest to oldest order
+    @GetMapping("/tickets/status/{status}/sortedByDate")
+    public List<Ticket> getTicketsByStatusSortedByDate(@PathVariable Status status){
+        return ticketRepository.findByStatusOrderByCreatedAtDesc(status);
+    }
+    
+    //get tickets by a priority ans sort by latest date
+    @GetMapping("/tickets/priority/{priority}/sortedByDate")
+    public List<Ticket> getTicketsByPrioritySortedByDate(@PathVariable Priority priority){
+        return ticketRepository.findByPriorityOrderByCreatedAtDesc(priority);
     }
 }
