@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import com.ticketing.ticketing_system.enums.Status;
 
 @RestController
 public class TicketController {
@@ -74,6 +75,26 @@ public class TicketController {
             e.printStackTrace();
         }
     }
+
+    //get all tickets by a particular status
+    @GetMapping("/tickets/status/{status}")
+    public List<Ticket> getTicketsbyStatus(@PathVariable Status status){
+       return ticketRepository.findByStatus(status);
+    }
+
+
+    //sort all tickets by status enum order
+    @GetMapping("/tickets/sorted/status")
+    public List<Ticket> getAllTicketsSortedByStatus(){
+        return ticketRepository.findAll(org.springframework.data.domain.Sort.by("status"));
+    }
+ 
+    //get tickets according to status in latest to oldest order
+    @GetMapping("/tickets/status/{status}/sortedByDate")
+    public List<Ticket> getTicketsByStatusSortedByDate(@PathVariable Status status){
+        return ticketRepository.findByStatusOrderByCreatedAtDesc(status);
+    }
+
 }
 
 
