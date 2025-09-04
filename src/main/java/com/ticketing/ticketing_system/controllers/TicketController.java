@@ -40,7 +40,7 @@ public class TicketController {
         if(ticketFound.isPresent()){
             return ticketFound.get();
         } else {
-            throw new RuntimeException("Ticket not found with id " + id);
+            throw new TicketNotFoundException("Ticket not found with id " + id);
         }
     }
 
