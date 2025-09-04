@@ -93,7 +93,7 @@ public class TicketController {
             ticket.setStatus(ticketDetails.getStatus());
             ticket.setDescription(ticketDetails.getDescription());
             ticket.setPriority(ticketDetails.getPriority());
-            ticket.setCategoryId(ticketDetails.getCategoryId());
+            ticket.setCategory(ticketDetails.getCategory());
 
             // Handle assignment if provided
             if (ticketDetails.getAssignedTo() != null && ticketDetails.getAssignedTo().getId() != null) {

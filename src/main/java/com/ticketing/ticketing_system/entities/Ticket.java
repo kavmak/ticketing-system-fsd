@@ -2,6 +2,7 @@ package com.ticketing.ticketing_system.entities;
 
 import java.time.LocalDateTime;
 
+import com.ticketing.ticketing_system.enums.Category;
 import com.ticketing.ticketing_system.enums.Priority;
 import com.ticketing.ticketing_system.enums.Status;
 
@@ -34,9 +35,11 @@ public class Ticket {
     @ManyToOne
     @JoinColumn(name = "assigned_to")
     private User assignedTo;
+    
 
-    @Column(name = "category_id", nullable = false)
-    private Long categoryId;
+    @Enumerated(EnumType.STRING) 
+    @Column(nullable = false)  // stores enum as string in DB ("IT", "HR", "FINANCE")
+    private Category category;
 
     // Priority Enum (LOW, MED, HIGH)
     @Enumerated(EnumType.STRING)
@@ -74,8 +77,8 @@ public class Ticket {
     public User getAssignedTo() { return assignedTo; }
     public void setAssignedTo(User assignedTo) { this.assignedTo = assignedTo; }
 
-    public Long getCategoryId() { return categoryId; }
-    public void setCategoryId(Long categoryId) { this.categoryId = categoryId; }
+    public Category getCategory() { return category; }
+    public void setCategory(Category category) { this.category = category; }
 
     public Priority getPriority() { return priority; }
     public void setPriority(Priority priority) { this.priority = priority; }

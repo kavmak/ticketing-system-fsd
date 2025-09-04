@@ -17,7 +17,7 @@ import com.ticketing.ticketing_system.enums.Role;
 import com.ticketing.ticketing_system.repositories.UserRepository;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
