@@ -4,7 +4,7 @@ package com.ticketing.ticketing_system.controllers;
 import com.ticketing.ticketing_system.entities.Ticket;
 import com.ticketing.ticketing_system.repositories.TicketRepository;
 import java.util.List;
-import java.util.Optional;
+//import java.util.Optional;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import com.ticketing.ticketing_system.enums.Status;
+import com.ticketing.ticketing_system.enums.Priority;
 
 @RestController
 public class TicketController {
@@ -90,7 +91,12 @@ public class TicketController {
     public List<Ticket> getTicketsByStatusSortedByDate(@PathVariable Status status){
         return ticketRepository.findByStatusOrderByCreatedAtDesc(status);
     }
-
+    
+    //get tickets by a priority ans sort by latest date
+    @GetMapping("/tickets/priority/{priority}/sortedByDate")
+    public List<Ticket> getTicketsByPrioritySortedByDate(@PathVariable Priority priority){
+        return ticketRepository.findByPriorityOrderByCreatedAtDesc(priority);
+    }
 }
 
 
