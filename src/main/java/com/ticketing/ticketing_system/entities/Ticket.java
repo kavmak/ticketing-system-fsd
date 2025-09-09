@@ -5,45 +5,61 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketing.ticketing_system.enums.Category;
-import com.ticketing.ticketing_system.enums.Status;
 import com.ticketing.ticketing_system.enums.Priority;
+import com.ticketing.ticketing_system.enums.Status;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.Data;
 
 @Data
 @Entity
+@Table(name = "requests")
 public class Ticket {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    int id;
-    int userId;
+    private int id;
 
-    String title;
-    String description;
-    String assignedTo;
+    private String title;
+    private String description;
 
     @CreationTimestamp
-    LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    LocalDateTime updatedAt;
-    LocalDateTime closedAt;
+    private LocalDateTime updatedAt;
+
+    private LocalDateTime closedAt;
 
     @Enumerated(EnumType.STRING)
-    Category category;
+    private Category category;
 
     @Enumerated(EnumType.STRING)
-    Status status;
+    private Status status;
 
     @Enumerated(EnumType.STRING)
-    Priority priority;
+    private Priority priority;
+
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "user_id", nullable = false)
+    private User createdBy;
+
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "assigned_to")
+    private User assignedTo;
+
+
+
 }
-
-
-
