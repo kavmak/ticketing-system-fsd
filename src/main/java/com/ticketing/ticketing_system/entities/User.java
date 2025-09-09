@@ -41,13 +41,13 @@ public class User {
 
     // One user can create many tickets
     @OneToMany(mappedBy = "createdBy")
-    @JsonIgnore
+    // @JsonIgnore
     private List<Ticket> ticketsCreated;
 
 
     // One user (agent) can be assigned many tickets
     @OneToMany(mappedBy = "assignedTo")
-    @JsonIgnore
+    // @JsonIgnore
     private List<Ticket> ticketsAssigned;
 
     public User() {

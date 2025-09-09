@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketing.ticketing_system.enums.Category;
 import com.ticketing.ticketing_system.enums.Priority;
 import com.ticketing.ticketing_system.enums.Status;
@@ -50,10 +51,12 @@ public class Ticket {
     private Priority priority;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "user_id", nullable = false)
     private User createdBy;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "assigned_to")
     private User assignedTo;
 
