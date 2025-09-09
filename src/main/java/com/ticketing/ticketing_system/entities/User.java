@@ -1,6 +1,5 @@
 package com.ticketing.ticketing_system.entities;
 
-<<<<<<< HEAD
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -8,25 +7,24 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketing.ticketing_system.enums.Role;
 
 import jakarta.persistence.Column;
-=======
->>>>>>> 909dd99183be06e892b0bc64b06a42957ac4f0cc
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-<<<<<<< HEAD
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.Data;
 
+@Data 
 @Entity
 @Table(name = "users")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     private String name;
 
@@ -52,50 +50,7 @@ public class User {
     @JsonIgnore
     private List<Ticket> ticketsAssigned;
 
-    // ---------------- Getters & Setters ----------------
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public User() {
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
-
-    public Role getRole() { return role; }
-    public void setRole(Role role) { this.role = role; }
-
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
-
-    public List<Ticket> getTicketsCreated() { return ticketsCreated; }
-    public void setTicketsCreated(List<Ticket> ticketsCreated) { this.ticketsCreated = ticketsCreated; }
-
-    public List<Ticket> getTicketsAssigned() { return ticketsAssigned; }
-    public void setTicketsAssigned(List<Ticket> ticketsAssigned) { this.ticketsAssigned = ticketsAssigned; }
-=======
-import com.ticketing.ticketing_system.enums.Role;
-import lombok.Data;
-
-
-@Data
-@Entity 
-public class User {
-  @Id
-  @GeneratedValue(strategy=GenerationType.AUTO)
-
-  int userId;
-  String email;
-  String password;
-
-  @Enumerated(EnumType.STRING)
-  Role role;
-    
->>>>>>> 909dd99183be06e892b0bc64b06a42957ac4f0cc
 }

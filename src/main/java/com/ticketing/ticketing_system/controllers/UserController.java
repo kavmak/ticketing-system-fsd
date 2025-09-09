@@ -43,14 +43,14 @@ public class UserController {
 
     // Get user by ID
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id) {
+    public User getUserById(@PathVariable ("id") int id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     // Update user
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+    public User updateUser(@PathVariable ("id") int id, @RequestBody User updatedUser) {
         return userRepository.findById(id)
                 .map(user -> {
                     user.setName(updatedUser.getName());
@@ -65,7 +65,7 @@ public class UserController {
 
     // Delete user
     @DeleteMapping("/{id}")
-    public String deleteUser(@PathVariable Long id) {
+    public String deleteUser(@PathVariable ("id") int id) {
         userRepository.deleteById(id);
         return "User deleted successfully";
     }
