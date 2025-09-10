@@ -1,10 +1,12 @@
 import { Link } from "react-router";
+
 function Navbar() {
     return (
         
    <nav className="navbar navbar-expand-lg bg-body-tertiary">
   <div className="container-fluid">
-    <a className="navbar-brand" href="#">Navbar</a>
+    <Link className="navbar-brand" to="/">Tickety</Link>
+
     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span className="navbar-toggler-icon"></span>
     </button>
@@ -15,13 +17,10 @@ function Navbar() {
           {/* <a  href="#">Home</a> */}
         </li>
         <li className="nav-item">
-          <Link className="nav-link" aria-current="page"to="/about">About Us</Link>
+          <Link className="nav-link" aria-current="page"to="/clients">Clients</Link>
         </li>
         <li className="nav-item">
-          <Link className="nav-link" aria-current="page"to="/trips">Trips</Link>
-        </li>
-        <li className="nav-item">
-            <Link className="nav-link" aria-current="page"to="/addtrip">Add Trip</Link>
+            <Link className="nav-link" aria-current="page"to="/addticket">Add Ticket</Link>
           {/* <a className="nav-link disabled" aria-disabled="true">Disabled</a> */}
         </li>
       </ul>
