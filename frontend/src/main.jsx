@@ -7,6 +7,7 @@ import { BrowserRouter, Route, Routes } from 'react-router'
 import 'bootstrap/dist/css/bootstrap.css'
 import Navbar from './components/common/Navbar.jsx'
 import Tickets from './components/Tickets.jsx'
+import Clients from './components/Clients.jsx'
 
 createRoot(document.getElementById('root')).render(
   // <StrictMode>
@@ -20,6 +21,8 @@ createRoot(document.getElementById('root')).render(
       <Route path="/trips" element={<ViewTrips />} />
       <Route path="/addtrip" element={<AddTrip />} /> */}
       <Route path="/tickets" element={<Tickets />}></Route>
+      <Route path="/clients" element={<Clients />}></Route>
+      {/* <Route path="/add ticket" element={<AddTicket />}></Route> */}
     </Routes>
   </BrowserRouter>,
 )
