@@ -7,6 +7,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketing.ticketing_system.enums.Category;
 import com.ticketing.ticketing_system.enums.Priority;
 import com.ticketing.ticketing_system.enums.Status;
@@ -52,11 +53,13 @@ public class Ticket {
     private Priority priority;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "user_id", nullable = false)
     @JsonBackReference("createdBy")
     private User createdBy;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "assigned_to")
     @JsonBackReference("assignedTo")
     private User assignedTo;

@@ -42,11 +42,11 @@ public class User {
    
 
     @OneToMany(mappedBy = "createdBy")
-    @JsonIgnore
+    // @JsonIgnore
     private List<Ticket> ticketsCreated;
 
     @OneToMany(mappedBy = "assignedTo")
-    @JsonIgnore
+    // @JsonIgnore
     private List<Ticket> ticketsAssigned;
 
     public User() {}

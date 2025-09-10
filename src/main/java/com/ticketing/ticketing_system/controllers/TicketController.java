@@ -15,6 +15,7 @@ import com.ticketing.ticketing_system.repositories.TicketRepository;
 import com.ticketing.ticketing_system.repositories.UserRepository;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 public class TicketController {
 
     @Autowired
