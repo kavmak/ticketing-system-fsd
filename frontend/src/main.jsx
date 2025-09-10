@@ -6,6 +6,7 @@ import Home from './components/Home.jsx'
 import { BrowserRouter, Route, Routes } from 'react-router'
 import 'bootstrap/dist/css/bootstrap.css'
 import Navbar from './components/common/Navbar.jsx'
+import Tickets from './components/Tickets.jsx'
 
 createRoot(document.getElementById('root')).render(
   // <StrictMode>
@@ -18,6 +19,7 @@ createRoot(document.getElementById('root')).render(
       {/* <Route path="/about" element={<About />} />
       <Route path="/trips" element={<ViewTrips />} />
       <Route path="/addtrip" element={<AddTrip />} /> */}
+      <Route path="/tickets" element={<Tickets />}></Route>
     </Routes>
   </BrowserRouter>,
 )
