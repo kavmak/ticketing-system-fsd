@@ -51,15 +51,13 @@ public class Ticket {
     private Priority priority;
 
     @ManyToOne
-    @JsonIgnore
+    // @JsonIgnore
     @JoinColumn(name = "user_id", nullable = false)
     private User createdBy;
 
     @ManyToOne
-    @JsonIgnore
+    // @JsonIgnore
     @JoinColumn(name = "assigned_to")
     private User assignedTo;
-
-
 
 }
