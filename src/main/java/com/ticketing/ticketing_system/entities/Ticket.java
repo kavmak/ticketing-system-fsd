@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ticketing.ticketing_system.enums.Category;
 import com.ticketing.ticketing_system.enums.Priority;
 import com.ticketing.ticketing_system.enums.Status;
@@ -22,7 +24,7 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "requests")
+@Table(name = "tickets")
 public class Ticket {
 
     @Id
@@ -51,12 +53,23 @@ public class Ticket {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference("createdBy")
     private User createdBy;
 
     @ManyToOne
     @JoinColumn(name = "assigned_to")
+    @JsonBackReference("assignedTo")
     private User assignedTo;
 
+    // Expose createdBy as just ID
+    @JsonProperty("createdByUserId")
+    public Integer getCreatedByUserId() {
+        return createdBy != null ? createdBy.getId() : null;
+    }
 
-
+    // Expose assignedTo as just ID
+    @JsonProperty("assignedToUserId")
+    public Integer getAssignedToUserId() {
+        return assignedTo != null ? assignedTo.getId() : null;
+    }
 }

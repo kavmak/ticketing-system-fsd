@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ticketing.ticketing_system.enums.Role;
 
 import jakarta.persistence.Column;
@@ -17,7 +18,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 
-@Data 
+@Data
 @Entity
 @Table(name = "users")
 public class User {
@@ -34,23 +35,30 @@ public class User {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    private Role role; // CUSTOMER, AGENT, ADMIN
+    private Role role; // USER, AGENT, ADMIN
 
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt = LocalDateTime.now();
+   
 
-    // One user can create many tickets
     @OneToMany(mappedBy = "createdBy")
     @JsonIgnore
     private List<Ticket> ticketsCreated;
 
-
-    // One user (agent) can be assigned many tickets
     @OneToMany(mappedBy = "assignedTo")
     @JsonIgnore
     private List<Ticket> ticketsAssigned;
 
-    public User() {
-    }
+    public User() {}
 
+    // Conditionally include tickets based on role
+    @JsonProperty("tickets")
+    public List<Ticket> getTicketsForRole() {
+        if (role == Role.USER) {
+            return ticketsCreated;
+        } else if (role == Role.AGENT) {
+            return ticketsAssigned;
+        }
+        return null; // ADMIN → no tickets
+    }
 }

@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.*;
 
 import com.ticketing.ticketing_system.enums.Status;
 import com.ticketing.ticketing_system.enums.Priority;
+import com.ticketing.ticketing_system.enums.Role;
 import com.ticketing.ticketing_system.entities.Ticket;
 import com.ticketing.ticketing_system.entities.User;
-//import com.ticketing.ticketing_system.exceptions.TicketNotFoundException;
 import com.ticketing.ticketing_system.repositories.TicketRepository;
 import com.ticketing.ticketing_system.repositories.UserRepository;
 
@@ -38,11 +38,11 @@ public class TicketController {
     @GetMapping("/tickets/{id}")
     public Ticket fetchATicket(@PathVariable("id") int id) {
         return ticketRepository.findById(id)
-                .orElseThrow(() -> new TicketNotFoundException("Ticket not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("Ticket not found with id: " + id));
     }
 
     // Get tickets created by a user
-    @GetMapping("/{id}/tickets-created")
+    @GetMapping("/users/{id}/tickets-created")
     public List<Ticket> getTicketsCreatedByUser(@PathVariable("id") int id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id " + id));
@@ -51,64 +51,57 @@ public class TicketController {
 
     // Get tickets assigned to a user
     @GetMapping("/users/{id}/tickets-assigned")
-    public List<Ticket> getTicketsAssignedToUser(@PathVariable  int id) {
-        User user = userRepository.findById( id)
+    public List<Ticket> getTicketsAssignedToUser(@PathVariable int id) {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id " + id));
         return user.getTicketsAssigned();
     }
 
-    // Create a new ticket
+    // Create a new ticket (only USER role allowed)
     @PostMapping("/tickets")
     @ResponseStatus(HttpStatus.CREATED)
     public Ticket addTicket(@RequestBody Ticket ticket) {
-        // Ensure createdBy user exists
-        if (ticket.getCreatedBy() != null && ticket.getCreatedBy().getId() != 0) {
-            User creator = userRepository.findById(ticket.getCreatedBy().getId())
-                    .orElseThrow(() -> new RuntimeException("User not found with id " + ticket.getCreatedBy().getId()));
-            ticket.setCreatedBy(creator);
-        } else {
+        if (ticket.getCreatedBy() == null || ticket.getCreatedBy().getId() == 0) {
             throw new RuntimeException("Ticket must have a valid creator (user_id)");
         }
 
-        // If assignedTo is provided, validate it
-        if (ticket.getAssignedTo() != null && ticket.getAssignedTo().getId() != 0) {
-            User assignee = userRepository.findById(ticket.getAssignedTo().getId())
-                    .orElseThrow(() -> new RuntimeException("Assigned user not found with id " + ticket.getAssignedTo().getId()));
-            ticket.setAssignedTo(assignee);
+        User creator = userRepository.findById(ticket.getCreatedBy().getId())
+                .orElseThrow(() -> new RuntimeException("User not found with id " + ticket.getCreatedBy().getId()));
+
+        if (creator.getRole() != Role.USER) {
+            throw new RuntimeException("Only users with role USER can create tickets");
         }
+
+        ticket.setCreatedBy(creator);
+        ticket.setAssignedTo(null); // only admin assigns later
+        ticket.setStatus(Status.OPEN);
 
         return ticketRepository.save(ticket);
     }
 
-    // // Update ticket
-    // @PutMapping("/tickets/{id}")
-    // public Ticket updateTicket(@PathVariable("id") int id, @RequestBody Ticket ticketDetails) {
-    //     return ticketRepository.findById(id).map(ticket -> {
-    //         ticket.setTitle(ticketDetails.getTitle());
-    //         ticket.setStatus(ticketDetails.getStatus());
-    //         ticket.setDescription(ticketDetails.getDescription());
-    //         ticket.setPriority(ticketDetails.getPriority());
-    //         ticket.setCategory(ticketDetails.getCategory());
-
-    //         // Handle assignment if provided
-    //         if (ticketDetails.getAssignedTo() != null && ticketDetails.getAssignedTo().getId() != null) {
-    //             User assignee = userRepository.findById(ticketDetails.getAssignedTo().getId())
-    //                     .orElseThrow(() -> new RuntimeException("Assigned user not found with id " + ticketDetails.getAssignedTo().getId()));
-    //             ticket.setAssignedTo(assignee);
-    //         }
-
-    //         return ticketRepository.save(ticket);
-    //     }).orElseThrow(() -> new TicketNotFoundException("Ticket not found with id " + id));
-    // }
-
-    // Assign a ticket to a user (agent)
-    @PutMapping("/tickets/{id}/assign/{userId}")
-    public Ticket assignTicket(@PathVariable("id") int id, @PathVariable("userId") int userId) {
+    // Assign a ticket to a user (only ADMIN can assign to AGENT)
+    @PutMapping("/tickets/{id}/assign/{userId}/by/{adminId}")
+    public Ticket assignTicket(@PathVariable("id") int id, @PathVariable("userId") int userId, @PathVariable("adminId") int adminId) {
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Ticket not found with id " + id));
+
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new RuntimeException("Admin not found with id " + adminId));
+
+        if (admin.getRole() != Role.ADMIN) {
+            throw new RuntimeException("Only ADMIN can assign tickets");
+        }
+
         User assignee = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id " + userId));
+
+        if (assignee.getRole() != Role.AGENT) {
+            throw new RuntimeException("Only AGENT can be assigned tickets");
+        }
+
         ticket.setAssignedTo(assignee);
+        ticket.setStatus(Status.IN_PROGRESS);
+
         return ticketRepository.save(ticket);
     }
 
@@ -121,7 +114,7 @@ public class TicketController {
 
     // Get all tickets by a particular status
     @GetMapping("/tickets/status/{status}")
-    public List<Ticket> getTicketsbyStatus(@PathVariable Status status) {
+    public List<Ticket> getTicketsByStatus(@PathVariable Status status) {
         return ticketRepository.findByStatus(status);
     }
 

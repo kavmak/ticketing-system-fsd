@@ -3,14 +3,7 @@ package com.ticketing.ticketing_system.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.ticketing.ticketing_system.entities.User;
 import com.ticketing.ticketing_system.enums.Role;
@@ -32,6 +25,7 @@ public class UserController {
     // Get all users
     @GetMapping
     public List<User> getAllUsers() {
+        // tickets will be included based on role (handled in User.java)
         return userRepository.findAll();
     }
 
@@ -43,14 +37,14 @@ public class UserController {
 
     // Get user by ID
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable ("id") int id) {
+    public User getUserById(@PathVariable("id") int id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     // Update user
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable ("id") int id, @RequestBody User updatedUser) {
+    public User updateUser(@PathVariable("id") int id, @RequestBody User updatedUser) {
         return userRepository.findById(id)
                 .map(user -> {
                     user.setName(updatedUser.getName());
@@ -65,7 +59,7 @@ public class UserController {
 
     // Delete user
     @DeleteMapping("/{id}")
-    public String deleteUser(@PathVariable ("id") int id) {
+    public String deleteUser(@PathVariable("id") int id) {
         userRepository.deleteById(id);
         return "User deleted successfully";
     }
