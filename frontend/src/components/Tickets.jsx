@@ -24,10 +24,10 @@ function Tickets() {
         const { data: ticketsData } = await axios.get("http://localhost:9090/tickets");
         setTickets(ticketsData);
 
-        // 2. Extract all unique user IDs
+        // 2. Extract all unique user IDs (createdByUserId + assignedToUserId)
         const userIds = [
           ...new Set(
-            ticketsData.flatMap((t) => [t.createdBy?.id, t.assignedTo?.id].filter(Boolean))
+            ticketsData.flatMap((t) => [t.createdByUserId, t.assignedToUserId].filter(Boolean))
           ),
         ];
 
@@ -80,10 +80,12 @@ function Tickets() {
             <td className="border px-4 py-2">{t.id}</td>
             <td className="border px-4 py-2">{t.title}</td>
             <td className="border px-4 py-2">
-              {userCache[t.createdBy?.id] || "Loading..."}
+              {userCache[t.createdByUserId] || "Loading..."}
             </td>
             <td className="border px-4 py-2">
-              {t.assignedTo ? userCache[t.assignedTo.id] || "Loading..." : "Unassigned"}
+              {t.assignedToUserId
+                ? userCache[t.assignedToUserId] || "Loading..."
+                : "Unassigned"}
             </td>
             <td className="border px-4 py-2">{t.category}</td>
             <td className="border px-4 py-2">{t.priority}</td>
