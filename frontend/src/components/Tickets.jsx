@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 // ✅ Utility to format date/time (dd-MM-yyyy HH:mm)
 const formatDateTime = (dateStr) => {
   if (!dateStr) return "-";
@@ -21,13 +23,13 @@ function Tickets() {
     const fetchTicketsAndUsers = async () => {
       try {
         // 1. Fetch all tickets
-        const { data: ticketsData } = await axios.get("http://localhost:9090/tickets");
+        const { data: ticketsData } = await axios.get(`${API_URL}/tickets`);
         setTickets(ticketsData);
 
         // 2. Extract all unique user IDs
         const userIds = [
           ...new Set(
-            ticketsData.flatMap((t) => [t.createdBy?.id, t.assignedTo?.id].filter(Boolean))
+            ticketsData.flatMap((t) => [t.createdByUserId, t.assignedToUserId].filter(Boolean))
           ),
         ];
 
@@ -36,7 +38,7 @@ function Tickets() {
         await Promise.all(
           userIds.map(async (id) => {
             try {
-              const res = await axios.get(`http://localhost:9090/users/${id}`);
+              const res = await axios.get(`${API_URL}/users/${id}`);
               userMap[id] = res.data.name;
             } catch {
               userMap[id] = "Unknown";
@@ -80,10 +82,10 @@ function Tickets() {
             <td className="border px-4 py-2">{t.id}</td>
             <td className="border px-4 py-2">{t.title}</td>
             <td className="border px-4 py-2">
-              {userCache[t.createdBy?.id] || "Loading..."}
+              {userCache[t.createdByUserId] || "Loading"}
             </td>
             <td className="border px-4 py-2">
-              {t.assignedTo ? userCache[t.assignedTo.id] || "Loading..." : "Unassigned"}
+              {userCache[t.assignedToUserId] ? userCache[t.assignedToUserId] : "Unassigned"}
             </td>
             <td className="border px-4 py-2">{t.category}</td>
             <td className="border px-4 py-2">{t.priority}</td>
