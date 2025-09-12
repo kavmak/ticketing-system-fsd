@@ -6,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.css'
 import Navbar from './components/common/Navbar.jsx'
 import Tickets from './components/tickets/Tickets.jsx'
 import Clients from './components/users/Clients.jsx'
+import AddTicket from './components/tickets/AddTicket.jsx'
 
 createRoot(document.getElementById('root')).render(
    <BrowserRouter>
@@ -14,6 +15,7 @@ createRoot(document.getElementById('root')).render(
       <Route path="/" element={<Home />} />
       <Route path="/tickets" element={<Tickets />}></Route>
       <Route path="/clients" element={<Clients />}></Route>
+      <Route path="/addTicket" element={<AddTicket />}></Route>
       {/* <Route path="/addticket" element={<AddTicket />}></Route> */}
     </Routes>
   </BrowserRouter>,
