@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+
 const API_URL = import.meta.env.VITE_API_URL;
+
 
 // ✅ Utility to format date/time (dd-MM-yyyy HH:mm)
 const formatDateTime = (dateStr) => {
@@ -18,13 +20,16 @@ const formatDateTime = (dateStr) => {
 function Tickets() {
   const [tickets, setTickets] = useState([]);
   const [userCache, setUserCache] = useState({});
+
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState();
+
 
   useEffect(() => {
     const fetchTicketsAndUsers = async () => {
       try {
         // 1. Fetch all tickets
+
         const { data: ticketsData } = await axios.get(
           `${API_URL}/tickets?page=${page}&size=2`
         );
@@ -37,6 +42,7 @@ function Tickets() {
             (ticketsData.content || []).flatMap((t) =>
               [t.createdByUserId, t.assignedToUserId].filter(Boolean)
             )
+
           ),
         ];
 
@@ -45,7 +51,9 @@ function Tickets() {
         await Promise.all(
           userIds.map(async (id) => {
             try {
+
               const res = await axios.get(`${API_URL}/users/${id}`);
+
               userMap[id] = res.data.name;
             } catch {
               userMap[id] = "Unknown";
@@ -60,6 +68,7 @@ function Tickets() {
     };
 
     fetchTicketsAndUsers();
+
   }, [page]);
 
   return (
@@ -115,6 +124,7 @@ function Tickets() {
         </tbody>
       </table>
     </>
+
   );
 }
 

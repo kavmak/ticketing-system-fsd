@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.*;
 
 import com.ticketing.ticketing_system.entities.User;
 import com.ticketing.ticketing_system.enums.Role;
+import com.ticketing.ticketing_system.mappers.UserMapper;
 import com.ticketing.ticketing_system.repositories.UserRepository;
+import com.ticketing.ticketing_system.dto.UserDTO;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
@@ -67,4 +69,14 @@ public class UserController {
         userRepository.deleteById(id);
         return "User deleted successfully";
     }
+
+    //get all users without ticket mapping
+    @GetMapping("/without-tickets")
+    public List<UserDTO> getAllUsersWithoutTickets(){
+        return userRepository.findAll()
+                             .stream()
+                             .map(UserMapper::toDTO)
+                             .toList();
+    }
+
 }
