@@ -27,9 +27,11 @@ function Tickets() {
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortDirection, setSortDirection] = useState("desc");
 
+ const API_URL = import.meta.env.VITE_API_URL;
+
   const fetchTickets = async (type, value, page = 0) => {
     try {
-      let url = "http://localhost:8080/tickets";
+      let url = `${API_URL}/tickets`;
       let params = {
         page: page,
         size: pageSize,
@@ -38,7 +40,7 @@ function Tickets() {
       };
 
       if (type && value) {
-        url = `http://localhost:8080/tickets/${type}/${value}`;
+        url = `${API_URL}/tickets/${type}/${value}`;
       }
 
       const response = await axios.get(url, { params });
@@ -74,7 +76,7 @@ function Tickets() {
       await Promise.all(
         userIds.map(async (id) => {
           try {
-            const res = await axios.get(`http://localhost:8080/users/${id}`);
+            const res = await axios.get(`${API_URL}/tickets/users/${id}`);
             userMap[id] = res.data.name;
           } catch {
             userMap[id] = "Unknown";

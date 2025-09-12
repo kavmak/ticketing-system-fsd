@@ -2,6 +2,7 @@ package com.ticketing.ticketing_system.controllers;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +39,7 @@ public class TicketController {
     // return ticketRepository.findAll();
     // }
 
+    @Cacheable("/tickets")
     @GetMapping("/tickets")
     public Page<Ticket> fetchAllTickets(
             @RequestParam(defaultValue = "0") int page,
