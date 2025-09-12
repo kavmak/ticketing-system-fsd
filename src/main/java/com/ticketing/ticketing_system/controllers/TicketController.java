@@ -16,6 +16,7 @@ import com.ticketing.ticketing_system.entities.Ticket;
 import com.ticketing.ticketing_system.entities.User;
 import com.ticketing.ticketing_system.repositories.TicketRepository;
 import com.ticketing.ticketing_system.repositories.UserRepository;
+import org.springframework.cache.annotation.Cacheable;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
@@ -38,6 +39,7 @@ public class TicketController {
     // return ticketRepository.findAll();
     // }
 
+    @Cacheable("tickets")
     @GetMapping("/tickets")
     public Page<Ticket> fetchAllTickets(
             @RequestParam(defaultValue = "0") int page,
