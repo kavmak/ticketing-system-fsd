@@ -1,0 +1,19 @@
+.filter-panel, .tickets-panel {
+  height: calc(100vh - 120px); /* Adjust based on your header height */
+}
+
+.filter-content {
+  max-height: calc(100% - 50px); /* Reserve space for the header */
+}
+
+.table-container {
+  max-height: calc(100% - 50px); /* Reserve space for the table header */
+}
+
+/* Ensure table headers stay visible when scrolling */
+.table-container thead th {
+  position: sticky;
+  top: 0;
+  background-color: #f8f9fa;
+  z-index: 1;
+}

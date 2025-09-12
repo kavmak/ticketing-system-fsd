@@ -1,6 +1,6 @@
 import { useState,useEffect } from "react";
 import axios from "axios";
-import Tickets from "./Tickets";
+import Tickets from "./tickets/Tickets";
 
 
 
@@ -10,7 +10,7 @@ function Home() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:9090/tickets")
+      .get("http://localhost:8080/tickets")
       .then((response) => {
         setTickets(response.data);
       })

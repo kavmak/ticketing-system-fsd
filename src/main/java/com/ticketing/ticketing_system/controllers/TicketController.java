@@ -1,6 +1,7 @@
 package com.ticketing.ticketing_system.controllers;
 
 import java.util.List;
+// import java.util.Locale.Category;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.ticketing.ticketing_system.enums.Status;
 import com.ticketing.ticketing_system.enums.Priority;
+import com.ticketing.ticketing_system.enums.Category;
 import com.ticketing.ticketing_system.enums.Role;
 import com.ticketing.ticketing_system.entities.Ticket;
 import com.ticketing.ticketing_system.entities.User;
@@ -82,7 +84,8 @@ public class TicketController {
 
     // Assign a ticket to a user (only ADMIN can assign to AGENT)
     @PutMapping("/tickets/{id}/assign/{userId}/by/{adminId}")
-    public Ticket assignTicket(@PathVariable("id") int id, @PathVariable("userId") int userId, @PathVariable("adminId") int adminId) {
+    public Ticket assignTicket(@PathVariable("id") int id, @PathVariable("userId") int userId,
+            @PathVariable("adminId") int adminId) {
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Ticket not found with id " + id));
 
@@ -135,5 +138,15 @@ public class TicketController {
     @GetMapping("/tickets/priority/{priority}/sortedByDate")
     public List<Ticket> getTicketsByPrioritySortedByDate(@PathVariable Priority priority) {
         return ticketRepository.findByPriorityOrderByCreatedAtDesc(priority);
+    }
+
+    @GetMapping("/tickets/priority/{priority}")
+    public List<Ticket> getTicketsByPriority(@PathVariable Priority priority) {
+        return ticketRepository.findByPriority(priority);
+    }
+
+    @GetMapping("/tickets/category/{category}")
+    public List<Ticket> getTicketsByCategory(@PathVariable Category category) {
+        return ticketRepository.findByCategory(category);
     }
 }
