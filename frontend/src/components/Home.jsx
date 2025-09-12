@@ -2,6 +2,9 @@ import { useState,useEffect } from "react";
 import axios from "axios";
 import Tickets from "./tickets/Tickets";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
+
 
 
 function Home() {
@@ -10,7 +13,7 @@ function Home() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:9090/tickets")
+      .get(`${API_URL}/tickets`)
       .then((response) => {
         setTickets(response.data);
       })
