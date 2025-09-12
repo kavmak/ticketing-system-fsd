@@ -3,6 +3,7 @@ package com.ticketing.ticketing_system.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -25,6 +26,7 @@ public class UserController {
     }
 
     // Get all users
+    @Cacheable("users")
     @GetMapping
     public List<User> getAllUsers() {
         // tickets will be included based on role (handled in User.java)
