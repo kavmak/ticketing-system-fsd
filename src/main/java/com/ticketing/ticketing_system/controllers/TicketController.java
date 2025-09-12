@@ -1,8 +1,12 @@
 package com.ticketing.ticketing_system.controllers;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,9 +34,11 @@ public class TicketController {
     }
 
     // Get all tickets
+    @Cacheable("tickets")
     @GetMapping("/tickets")
-    public List<Ticket> fetchAllTickets() {
-        return ticketRepository.findAll();
+    public Page<Ticket> fetchAllTickets(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
+        PageRequest pageable = PageRequest.of(page,size);
+        return ticketRepository.findAll(pageable);
     }
 
     // Get a specific ticket
@@ -82,7 +88,8 @@ public class TicketController {
 
     // Assign a ticket to a user (only ADMIN can assign to AGENT)
     @PutMapping("/tickets/{id}/assign/{userId}/by/{adminId}")
-    public Ticket assignTicket(@PathVariable("id") int id, @PathVariable("userId") int userId, @PathVariable("adminId") int adminId) {
+    public Ticket assignTicket(@PathVariable("id") int id, @PathVariable("userId") int userId,
+            @PathVariable("adminId") int adminId) {
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Ticket not found with id " + id));
 
@@ -136,4 +143,34 @@ public class TicketController {
     public List<Ticket> getTicketsByPrioritySortedByDate(@PathVariable Priority priority) {
         return ticketRepository.findByPriorityOrderByCreatedAtDesc(priority);
     }
+
+    @PatchMapping("/tickets/{id}")
+    public Ticket updateTicketFields(@PathVariable("id") int id, @RequestBody Map<String, Object> updates) {
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ticket not found with id " + id));
+
+        updates.forEach((field, value) -> {
+            switch (field) {
+                case "title":
+                    ticket.setTitle((String) value);
+                    break;
+                case "description":
+                    ticket.setDescription((String) value);
+                    break;
+                case "status":
+                    // Convert string to enum if your Status is enum
+                    ticket.setStatus(Status.valueOf(((String) value).toUpperCase()));
+                    break;
+                case "priority":
+                    // Example if you have Priority enum
+                    ticket.setPriority(Priority.valueOf(((String) value).toUpperCase()));
+                    break;
+                default:
+                    throw new RuntimeException("Invalid field: " + field);
+            }
+        });
+
+        return ticketRepository.save(ticket);
+    }
+
 }
