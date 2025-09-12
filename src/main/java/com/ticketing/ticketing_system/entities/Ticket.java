@@ -53,13 +53,11 @@ public class Ticket {
 
     @ManyToOne
 
-
     @JoinColumn(name = "user_id", nullable = false)
     @JsonBackReference("createdBy")
     private User createdBy;
 
     @ManyToOne
-
 
     @JoinColumn(name = "assigned_to")
     @JsonBackReference("assignedTo")
