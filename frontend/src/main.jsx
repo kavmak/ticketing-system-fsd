@@ -6,8 +6,8 @@ import Home from './components/Home.jsx'
 import { BrowserRouter, Route, Routes } from 'react-router'
 import 'bootstrap/dist/css/bootstrap.css'
 import Navbar from './components/common/Navbar.jsx'
-import Tickets from './components/Tickets.jsx'
-import Clients from './components/Clients.jsx'
+import Tickets from './components/tickets/Tickets.jsx'
+import Clients from './components/users/Clients.jsx'
 
 createRoot(document.getElementById('root')).render(
   // <StrictMode>

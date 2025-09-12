@@ -1,6 +1,6 @@
 import { useState,useEffect } from "react";
 import axios from "axios";
-import Tickets from "./Tickets";
+import Tickets from "./tickets/Tickets";
 
 
 
