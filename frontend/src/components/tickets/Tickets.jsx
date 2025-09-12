@@ -31,7 +31,7 @@ function Tickets() {
         // 1. Fetch all tickets
 
         const { data: ticketsData } = await axios.get(
-          `${API_URL}/tickets?page=${page}&size=2`
+          `${API_URL}/tickets?page=${page}&size=5`
         );
         setTickets(ticketsData.content || []);
         setTotalPages(ticketsData.totalPages || 0);

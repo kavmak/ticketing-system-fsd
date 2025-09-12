@@ -36,7 +36,7 @@ public class TicketController {
     // Get all tickets
     @Cacheable("tickets")
     @GetMapping("/tickets")
-    public Page<Ticket> fetchAllTickets(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
+    public Page<Ticket> fetchAllTickets(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "5") Integer size) {
         PageRequest pageable = PageRequest.of(page,size);
         return ticketRepository.findAll(pageable);
     }

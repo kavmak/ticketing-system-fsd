@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -23,6 +24,7 @@ public class UserController {
 
     // Create a new user
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public User createUser(@RequestBody User user) {
         return userRepository.save(user);
     }

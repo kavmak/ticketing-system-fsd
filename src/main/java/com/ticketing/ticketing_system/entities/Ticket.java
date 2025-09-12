@@ -7,7 +7,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketing.ticketing_system.enums.Category;
 import com.ticketing.ticketing_system.enums.Priority;
 import com.ticketing.ticketing_system.enums.Status;
