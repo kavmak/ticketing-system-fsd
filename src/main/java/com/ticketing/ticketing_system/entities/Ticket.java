@@ -53,11 +53,13 @@ public class Ticket {
     private Priority priority;
 
     @ManyToOne
+
     @JoinColumn(name = "user_id", nullable = false)
     @JsonBackReference("createdBy")
     private User createdBy;
 
     @ManyToOne
+
     @JoinColumn(name = "assigned_to")
     @JsonBackReference("assignedTo")
     private User assignedTo;

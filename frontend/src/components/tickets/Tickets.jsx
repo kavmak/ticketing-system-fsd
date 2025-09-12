@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Row, Col } from "react-bootstrap";
+import { Row, Col, Pagination } from "react-bootstrap";
 import './Tickets.css';
 
 // Format date/time
@@ -18,23 +18,55 @@ const formatDateTime = (dateStr) => {
 function Tickets() {
   const [tickets, setTickets] = useState([]);
   const [userCache, setUserCache] = useState({});
-  const [filterType, setFilterType] = useState(""); 
+  const [filterType, setFilterType] = useState("");
   const [filterValue, setFilterValue] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalElements, setTotalElements] = useState(0);
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortDirection, setSortDirection] = useState("desc");
 
-  const fetchTickets = async (type, value) => {
+  const fetchTickets = async (type, value, page = 0) => {
     try {
-      const url =
-        type && value
-          ? `http://localhost:8080/tickets/${type}/${value}`
-          : "http://localhost:8080/tickets";
-      const { data: ticketsData } = await axios.get(url);
-      setTickets(ticketsData);
+      let url = "http://localhost:8080/tickets";
+      let params = {
+        page: page,
+        size: pageSize,
+        sortBy: sortBy,
+        direction: sortDirection
+      };
 
+      if (type && value) {
+        url = `http://localhost:8080/tickets/${type}/${value}`;
+      }
+
+      const response = await axios.get(url, { params });
+      
+      if (response.data && response.data.content) {
+        // For paginated responses
+        setTickets(response.data.content);
+        setTotalPages(response.data.totalPages);
+        setTotalElements(response.data.totalElements);
+        setCurrentPage(response.data.number);
+      } else {
+        // For non-paginated responses (fallback)
+        setTickets(response.data);
+        setTotalPages(1);
+        setTotalElements(response.data.length);
+        setCurrentPage(0);
+      }
+
+      // Cache user names
       const userIds = [
         ...new Set(
-          ticketsData.flatMap((t) =>
-            [t.createdBy?.id, t.assignedTo?.id].filter(Boolean)
-          )
+          response.data.content
+            ? response.data.content.flatMap((t) =>
+                [t.createdByUserId, t.assignedToUserId].filter(Boolean)
+              )
+            : response.data.flatMap((t) =>
+                [t.createdByUserId, t.assignedToUserId].filter(Boolean)
+              )
         ),
       ];
 
@@ -54,25 +86,62 @@ function Tickets() {
       console.error("Error fetching tickets", err);
       setTickets([]);
       setUserCache({});
+      setTotalPages(0);
+      setTotalElements(0);
     }
   };
 
   useEffect(() => {
-    fetchTickets();
+    fetchTickets(filterType, filterValue, currentPage);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentPage, pageSize, sortBy, sortDirection]);
 
   const handleFilterClick = (type, value) => {
+    setCurrentPage(0);
     if (filterType === type && filterValue === value) {
       setFilterType("");
       setFilterValue("");
-      fetchTickets();
+      fetchTickets("", "", 0);
     } else {
       setFilterType(type);
       setFilterValue(value);
-      fetchTickets(type, value);
+      fetchTickets(type, value, 0);
     }
   };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (e) => {
+    setPageSize(parseInt(e.target.value));
+    setCurrentPage(0);
+  };
+
+  const handleSort = (column) => {
+    if (sortBy === column) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(column);
+      setSortDirection("desc");
+    }
+    setCurrentPage(0);
+  };
+
+  const SortableHeader = ({ column, label }) => (
+    <th 
+      onClick={() => handleSort(column.toLowerCase().replace(" ", ""))}
+      style={{ cursor: "pointer" }}
+      className={sortBy === column.toLowerCase().replace(" ", "") ? "sort-active" : ""}
+    >
+      {label}
+      {sortBy === column.toLowerCase().replace(" ", "") && (
+        <span className="ms-1">
+          {sortDirection === "asc" ? "↑" : "↓"}
+        </span>
+      )}
+    </th>
+  );
 
   const FilterSection = ({ title, type, options }) => (
     <div className="mb-4">
@@ -104,6 +173,28 @@ function Tickets() {
     </div>
   );
 
+  // Generate pagination items
+  const paginationItems = [];
+  const maxVisiblePages = 5;
+  let startPage = Math.max(0, currentPage - Math.floor(maxVisiblePages / 2));
+  let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
+  
+  if (endPage - startPage + 1 < maxVisiblePages) {
+    startPage = Math.max(0, endPage - maxVisiblePages + 1);
+  }
+  
+  for (let i = startPage; i <= endPage; i++) {
+    paginationItems.push(
+      <Pagination.Item
+        key={i}
+        active={i === currentPage}
+        onClick={() => handlePageChange(i)}
+      >
+        {i + 1}
+      </Pagination.Item>
+    );
+  }
+
   return (
     <div className="px-4 py-3">
       <Row className="g-4 align-items-start">
@@ -116,6 +207,7 @@ function Tickets() {
                 onClick={() => {
                   setFilterType("");
                   setFilterValue("");
+                  setCurrentPage(0);
                   fetchTickets();
                 }}
                 className="btn btn-link btn-sm text-decoration-none"
@@ -136,19 +228,40 @@ function Tickets() {
         {/* Right: Tickets Table */}
         <Col md={9} className="tickets-panel">
           <div className="bg-white rounded shadow-sm p-3 border h-100 d-flex flex-column">
-            <h2 className="h4 mb-3">Tickets</h2>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h2 className="h4 mb-0">Tickets</h2>
+              <div className="d-flex align-items-center">
+                <span className="me-2">Show:</span>
+                <select 
+                  className="form-select form-select-sm w-auto" 
+                  value={pageSize}
+                  onChange={handlePageSizeChange}
+                >
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="20">20</option>
+                  <option value="50">50</option>
+                </select>
+                <span className="ms-2 text-muted">
+                  {totalElements} total tickets
+                </span>
+              </div>
+            </div>
             
             {/* Scrollable table container */}
             <div className="table-container flex-grow-1" style={{ overflowY: 'auto' }}>
               <table className="table table-bordered table-striped align-middle mb-0">
                 <thead className="table-light">
                   <tr>
-                    {[
-                      "ID","Title","Created By","Assigned To","Category","Priority",
-                      "Status","Created At","Updated At"
-                    ].map((heading) => (
-                      <th key={heading}>{heading}</th>
-                    ))}
+                    <SortableHeader column="id" label="ID" />
+                    <SortableHeader column="title" label="Title" />
+                    <th>Created By</th>
+                    <th>Assigned To</th>
+                    <SortableHeader column="category" label="Category" />
+                    <SortableHeader column="priority" label="Priority" />
+                    <SortableHeader column="status" label="Status" />
+                    <SortableHeader column="createdAt" label="Created At" />
+                    <SortableHeader column="updatedAt" label="Updated At" />
                   </tr>
                 </thead>
                 <tbody>
@@ -163,8 +276,8 @@ function Tickets() {
                       <tr key={t.id}>
                         <td>{t.id}</td>
                         <td>{t.title}</td>
-                        <td>{userCache[t.createdBy?.id] ?? "Loading..."}</td>
-                        <td>{t.assignedTo ? userCache[t.assignedTo.id] ?? "Loading..." : "Unassigned"}</td>
+                        <td>{userCache[t.createdByUserId] || "Loading..."}{`(ID: ${t.createdByUserId})`}</td>
+                        <td>{userCache[t.assignedToUserId] ? userCache[t.assignedToUserId] : "Unassigned"}</td>
                         <td>{t.category}</td>
                         <td>{t.priority}</td>
                         <td>{t.status}</td>
@@ -176,6 +289,49 @@ function Tickets() {
                 </tbody>
               </table>
             </div>
+            
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="d-flex justify-content-center mt-3">
+                <Pagination>
+                  <Pagination.First 
+                    onClick={() => handlePageChange(0)} 
+                    disabled={currentPage === 0}
+                  />
+                  <Pagination.Prev 
+                    onClick={() => handlePageChange(currentPage - 1)} 
+                    disabled={currentPage === 0}
+                  />
+                  
+                  {startPage > 0 && (
+                    <>
+                      <Pagination.Item onClick={() => handlePageChange(0)}>1</Pagination.Item>
+                      {startPage > 1 && <Pagination.Ellipsis />}
+                    </>
+                  )}
+                  
+                  {paginationItems}
+                  
+                  {endPage < totalPages - 1 && (
+                    <>
+                      {endPage < totalPages - 2 && <Pagination.Ellipsis />}
+                      <Pagination.Item onClick={() => handlePageChange(totalPages - 1)}>
+                        {totalPages}
+                      </Pagination.Item>
+                    </>
+                  )}
+                  
+                  <Pagination.Next 
+                    onClick={() => handlePageChange(currentPage + 1)} 
+                    disabled={currentPage === totalPages - 1}
+                  />
+                  <Pagination.Last 
+                    onClick={() => handlePageChange(totalPages - 1)} 
+                    disabled={currentPage === totalPages - 1}
+                  />
+                </Pagination>
+              </div>
+            )}
           </div>
         </Col>
       </Row>

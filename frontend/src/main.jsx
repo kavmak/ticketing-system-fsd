@@ -1,7 +1,5 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import App from './App.jsx'
 import Home from './components/Home.jsx'
 import { BrowserRouter, Route, Routes } from 'react-router'
 import 'bootstrap/dist/css/bootstrap.css'
@@ -10,19 +8,13 @@ import Tickets from './components/tickets/Tickets.jsx'
 import Clients from './components/users/Clients.jsx'
 
 createRoot(document.getElementById('root')).render(
-  // <StrictMode>
-  //   <App />
-  // </StrictMode>,
    <BrowserRouter>
    <Navbar/>
     <Routes>
       <Route path="/" element={<Home />} />
-      {/* <Route path="/about" element={<About />} />
-      <Route path="/trips" element={<ViewTrips />} />
-      <Route path="/addtrip" element={<AddTrip />} /> */}
       <Route path="/tickets" element={<Tickets />}></Route>
       <Route path="/clients" element={<Clients />}></Route>
-      {/* <Route path="/add ticket" element={<AddTicket />}></Route> */}
+      {/* <Route path="/addticket" element={<AddTicket />}></Route> */}
     </Routes>
   </BrowserRouter>,
 )

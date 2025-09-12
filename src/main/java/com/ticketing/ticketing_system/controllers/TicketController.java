@@ -1,12 +1,13 @@
 package com.ticketing.ticketing_system.controllers;
 
 import java.util.List;
-// import java.util.Locale.Category;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
 import com.ticketing.ticketing_system.enums.Status;
 import com.ticketing.ticketing_system.enums.Priority;
 import com.ticketing.ticketing_system.enums.Category;
@@ -32,9 +33,75 @@ public class TicketController {
     }
 
     // Get all tickets
+    // @GetMapping("/tickets")
+    // public List<Ticket> fetchAllTickets() {
+    // return ticketRepository.findAll();
+    // }
+
     @GetMapping("/tickets")
-    public List<Ticket> fetchAllTickets() {
-        return ticketRepository.findAll();
+    public Page<Ticket> fetchAllTickets(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction) {
+
+        Sort.Direction sortDirection = direction.equalsIgnoreCase("desc")
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
+
+        return ticketRepository.findAll(pageable);
+    }
+
+    // Get tickets by status with pagination
+    @GetMapping("/tickets/status/{status}")
+    public Page<Ticket> getTicketsByStatus(
+            @PathVariable Status status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction) {
+
+        Sort.Direction sortDirection = direction.equalsIgnoreCase("desc")
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
+
+        return ticketRepository.findByStatus(status, pageable);
+    }
+
+    // Get tickets by priority with pagination
+    @GetMapping("/tickets/priority/{priority}")
+    public Page<Ticket> getTicketsByPriority(
+            @PathVariable Priority priority,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction) {
+
+        Sort.Direction sortDirection = direction.equalsIgnoreCase("desc")
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
+
+        return ticketRepository.findByPriority(priority, pageable);
+    }
+
+    // Get tickets by category with pagination
+    @GetMapping("/tickets/category/{category}")
+    public Page<Ticket> getTicketsByCategory(
+            @PathVariable Category category,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction) {
+
+        Sort.Direction sortDirection = direction.equalsIgnoreCase("desc")
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
+
+        return ticketRepository.findByCategory(category, pageable);
     }
 
     // Get a specific ticket
@@ -117,10 +184,10 @@ public class TicketController {
     }
 
     // Get all tickets by a particular status
-    @GetMapping("/tickets/status/{status}")
-    public List<Ticket> getTicketsByStatus(@PathVariable Status status) {
-        return ticketRepository.findByStatus(status);
-    }
+    // @GetMapping("/tickets/status/{status}")
+    // public List<Ticket> getTicketsByStatus(@PathVariable Status status) {
+    // return ticketRepository.findByStatus(status);
+    // }
 
     // Sort all tickets by status enum order
     @GetMapping("/tickets/sorted/status")
@@ -140,13 +207,14 @@ public class TicketController {
         return ticketRepository.findByPriorityOrderByCreatedAtDesc(priority);
     }
 
-    @GetMapping("/tickets/priority/{priority}")
-    public List<Ticket> getTicketsByPriority(@PathVariable Priority priority) {
-        return ticketRepository.findByPriority(priority);
-    }
+    // @GetMapping("/tickets/priority/{priority}")
+    // public List<Ticket> getTicketsByPriority(@PathVariable Priority priority) {
+    // return ticketRepository.findByPriority(priority);
+    // }
 
-    @GetMapping("/tickets/category/{category}")
-    public List<Ticket> getTicketsByCategory(@PathVariable Category category) {
-        return ticketRepository.findByCategory(category);
-    }
+    // @GetMapping("/tickets/category/{category}")
+    // public List<Ticket> getTicketsByCategory(@PathVariable Category category) {
+    // return ticketRepository.findByCategory(category);
+    // }
+
 }
