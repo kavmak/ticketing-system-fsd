@@ -10,9 +10,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import com.ticketing.ticketing_system.enums.Status;
+import com.ticketing.ticketing_system.mappers.TicketMapper;
 import com.ticketing.ticketing_system.enums.Priority;
 import com.ticketing.ticketing_system.enums.Category;
 import com.ticketing.ticketing_system.enums.Role;
+import com.ticketing.ticketing_system.dto.TicketDTO;
 import com.ticketing.ticketing_system.entities.Ticket;
 import com.ticketing.ticketing_system.entities.User;
 import com.ticketing.ticketing_system.repositories.TicketRepository;
@@ -33,12 +35,7 @@ public class TicketController {
         return "test done";
     }
 
-    // Get all tickets
-    // @GetMapping("/tickets")
-    // public List<Ticket> fetchAllTickets() {
-    // return ticketRepository.findAll();
-    // }
-
+    
     @Cacheable("/tickets")
     @GetMapping("/tickets")
     public Page<Ticket> fetchAllTickets(
@@ -132,21 +129,34 @@ public class TicketController {
     // Create a new ticket (only USER role allowed)
     @PostMapping("/tickets")
     @ResponseStatus(HttpStatus.CREATED)
-    public Ticket addTicket(@RequestBody Ticket ticket) {
-        if (ticket.getCreatedBy() == null || ticket.getCreatedBy().getId() == 0) {
+    public Ticket addTicket(@RequestBody TicketDTO ticketDTO) {
+        if (ticketDTO.getCreatedByUserId() == null || ticketDTO.getCreatedByUserId()== 0) {
             throw new RuntimeException("Ticket must have a valid creator (user_id)");
         }
 
-        User creator = userRepository.findById(ticket.getCreatedBy().getId())
-                .orElseThrow(() -> new RuntimeException("User not found with id " + ticket.getCreatedBy().getId()));
+        User creator = userRepository.findById(ticketDTO.getCreatedByUserId())
+                .orElseThrow(() -> new RuntimeException("User not found with id " + ticketDTO.getCreatedByUserId()));
 
         if (creator.getRole() != Role.USER) {
             throw new RuntimeException("Only users with role USER can create tickets");
         }
+      
+         User assignee = null;
+    if (ticketDTO.getAssignedToUserId() != null) {
+        assignee = userRepository.findById(ticketDTO.getAssignedToUserId())
+                .orElseThrow(() -> new RuntimeException("User not found with id " + ticketDTO.getAssignedToUserId()));
+    }
+       // ticket.setCreatedBy(creator);
+       // ticket.setAssignedTo(null); // only admin assigns later
+       // ticket.setStatus(Status.OPEN);
 
-        ticket.setCreatedBy(creator);
-        ticket.setAssignedTo(null); // only admin assigns later
-        ticket.setStatus(Status.OPEN);
+        // map DTO → Entity
+    Ticket ticket = TicketMapper.toEntity(ticketDTO, creator, assignee);
+
+    // enforce defaults
+    ticket.setStatus(Status.OPEN);
+    ticket.setAssignedTo(null); // assigned later by admin
+
 
         return ticketRepository.save(ticket);
     }
