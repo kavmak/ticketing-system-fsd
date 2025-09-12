@@ -39,7 +39,6 @@ public class User {
 
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt = LocalDateTime.now();
-   
 
     @OneToMany(mappedBy = "createdBy")
     @JsonIgnore
@@ -49,7 +48,8 @@ public class User {
     @JsonIgnore
     private List<Ticket> ticketsAssigned;
 
-    public User() {}
+    public User() {
+    }
 
     // Conditionally include tickets based on role
     @JsonProperty("tickets")
