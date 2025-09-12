@@ -3,12 +3,15 @@ package com.ticketing.ticketing_system.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 
 import com.ticketing.ticketing_system.entities.User;
 import com.ticketing.ticketing_system.enums.Role;
+import com.ticketing.ticketing_system.mappers.UserMapper;
 import com.ticketing.ticketing_system.repositories.UserRepository;
+import com.ticketing.ticketing_system.dto.UserDTO;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
@@ -25,6 +28,7 @@ public class UserController {
     }
 
     // Get all users
+    @Cacheable("users")
     @GetMapping
     public List<User> getAllUsers() {
         // tickets will be included based on role (handled in User.java)
@@ -65,4 +69,14 @@ public class UserController {
         userRepository.deleteById(id);
         return "User deleted successfully";
     }
+
+    //get all users without ticket mapping
+    @GetMapping("/without-tickets")
+    public List<UserDTO> getAllUsersWithoutTickets(){
+        return userRepository.findAll()
+                             .stream()
+                             .map(UserMapper::toDTO)
+                             .toList();
+    }
+
 }

@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+
+const API_URL = import.meta.env.VITE_API_URL;
+
+
 // ✅ Utility to format date/time (dd-MM-yyyy HH:mm)
 const formatDateTime = (dateStr) => {
   if (!dateStr) return "-";
@@ -17,17 +21,28 @@ function Tickets() {
   const [tickets, setTickets] = useState([]);
   const [userCache, setUserCache] = useState({});
 
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState();
+
+
   useEffect(() => {
     const fetchTicketsAndUsers = async () => {
       try {
         // 1. Fetch all tickets
-        const { data: ticketsData } = await axios.get("http://localhost:9090/tickets");
-        setTickets(ticketsData);
 
-        // 2. Extract all unique user IDs (createdByUserId + assignedToUserId)
+        const { data: ticketsData } = await axios.get(
+          `${API_URL}/tickets?page=${page}&size=2`
+        );
+        setTickets(ticketsData.content || []);
+        setTotalPages(ticketsData.totalPages || 0);
+
+        // 2. Extract all unique user IDs
         const userIds = [
           ...new Set(
-            ticketsData.flatMap((t) => [t.createdByUserId, t.assignedToUserId].filter(Boolean))
+            (ticketsData.content || []).flatMap((t) =>
+              [t.createdByUserId, t.assignedToUserId].filter(Boolean)
+            )
+
           ),
         ];
 
@@ -36,7 +51,9 @@ function Tickets() {
         await Promise.all(
           userIds.map(async (id) => {
             try {
-              const res = await axios.get(`http://localhost:9090/users/${id}`);
+
+              const res = await axios.get(`${API_URL}/users/${id}`);
+
               userMap[id] = res.data.name;
             } catch {
               userMap[id] = "Unknown";
@@ -51,51 +68,63 @@ function Tickets() {
     };
 
     fetchTicketsAndUsers();
-  }, []);
+
+  }, [page]);
 
   return (
-    <table className="table-auto border-collapse border border-gray-300 w-full">
-      <thead>
-        <tr className="bg-gray-200">
-          {[
-            "ID",
-            "Title",
-            "Created By",
-            "Assigned To",
-            "Category",
-            "Priority",
-            "Status",
-            "Created At",
-            "Updated At",
-          ].map((heading) => (
-            <th key={heading} className="border px-4 py-2">
-              {heading}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {tickets.map((t) => (
-          <tr key={t.id}>
-            <td className="border px-4 py-2">{t.id}</td>
-            <td className="border px-4 py-2">{t.title}</td>
-            <td className="border px-4 py-2">
-              {userCache[t.createdByUserId] || "Loading..."}
-            </td>
-            <td className="border px-4 py-2">
-              {t.assignedToUserId
-                ? userCache[t.assignedToUserId] || "Loading..."
-                : "Unassigned"}
-            </td>
-            <td className="border px-4 py-2">{t.category}</td>
-            <td className="border px-4 py-2">{t.priority}</td>
-            <td className="border px-4 py-2">{t.status}</td>
-            <td className="border px-4 py-2">{formatDateTime(t.createdAt)}</td>
-            <td className="border px-4 py-2">{formatDateTime(t.updatedAt)}</td>
+    <>
+    <div>
+      <button disabled={page===0} onClick={()=>setPage(page-1)}>⬅ Prev</button>
+      <button disabled={page===(totalPages-1)} onClick={()=>setPage(page+1)}>Next ➡</button>
+    </div>
+      <table className="table-auto border-collapse border border-gray-300 w-full">
+        <thead>
+          <tr className="bg-gray-200">
+            {[
+              "ID",
+              "Title",
+              "Created By",
+              "Assigned To",
+              "Category",
+              "Priority",
+              "Status",
+              "Created At",
+              "Updated At",
+            ].map((heading) => (
+              <th key={heading} className="border px-4 py-2">
+                {heading}
+              </th>
+            ))}
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {tickets.map((t) => (
+            <tr key={t.id}>
+              <td className="border px-4 py-2">{t.id}</td>
+              <td className="border px-4 py-2">{t.title}</td>
+              <td className="border px-4 py-2">
+                {userCache[t.createdByUserId] || "Loading"} {`(ID: ${t.createdByUserId})`}
+              </td>
+              <td className="border px-4 py-2">
+                {userCache[t.assignedToUserId]
+                  ? userCache[t.assignedToUserId]
+                  : "Unassigned"}
+              </td>
+              <td className="border px-4 py-2">{t.category}</td>
+              <td className="border px-4 py-2">{t.priority}</td>
+              <td className="border px-4 py-2">{t.status}</td>
+              <td className="border px-4 py-2">
+                {formatDateTime(t.createdAt)}
+              </td>
+              <td className="border px-4 py-2">
+                {formatDateTime(t.updatedAt)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
+
   );
 }
 
