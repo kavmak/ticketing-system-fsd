@@ -23,6 +23,9 @@ function Navbar() {
             <Link className="nav-link" aria-current="page"to="/addticket">Add Ticket</Link>
           {/* <a className="nav-link disabled" aria-disabled="true">Disabled</a> */}
         </li>
+        <li className="nav-item">
+          <Link className="nav-link" aria-current="page"to="/addUser">Add User</Link>
+        </li>
       </ul>
     </div>
   </div>
