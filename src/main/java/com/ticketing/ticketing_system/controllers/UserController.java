@@ -3,6 +3,7 @@ package com.ticketing.ticketing_system.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,12 +25,13 @@ public class UserController {
     // Create a new user
     @PostMapping
     public User createUser(@RequestBody User user) {
-        return userRepository.save(user);
+        return userRepository.saveAndFlush(user);
     }
 
     // Get all users
-    @Cacheable("users")
+   
     @GetMapping
+    @CacheEvict(value = "users", allEntries = true)
     public List<User> getAllUsers() {
         // tickets will be included based on role (handled in User.java)
         return userRepository.findAll();
