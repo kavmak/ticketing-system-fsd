@@ -29,7 +29,7 @@ function Tickets() {
 
   const fetchTickets = async (type, value, page = 0) => {
     try {
-      let url = "http://localhost:8080/tickets";
+      let url = "http://localhost:9090/tickets";
       let params = {
         page: page,
         size: pageSize,
@@ -38,7 +38,7 @@ function Tickets() {
       };
 
       if (type && value) {
-        url = `http://localhost:8080/tickets/${type}/${value}`;
+        url = `http://localhost:9090/tickets/${type}/${value}`;
       }
 
       const response = await axios.get(url, { params });
@@ -74,7 +74,7 @@ function Tickets() {
       await Promise.all(
         userIds.map(async (id) => {
           try {
-            const res = await axios.get(`http://localhost:8080/users/${id}`);
+            const res = await axios.get(`http://localhost:9090/users/${id}`);
             userMap[id] = res.data.name;
           } catch {
             userMap[id] = "Unknown";
